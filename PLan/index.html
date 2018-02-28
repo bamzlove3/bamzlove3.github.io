@@ -1,16 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-	<meta charset="UTF-8">
-	<title>Document</title>
+
+        <meta charset="utf-8" />
+
+        <title>Demo Chat</title>
+
+        <link href="bootstrap.css" rel="stylesheet">
+
+	<style>
+		body {
+			padding:20px;
+		}
+		#console {
+			height: 400px;
+			overflow: auto;
+		}
+		.username-msg {color:orange;}
+		.connect-msg {color:green;}
+		.disconnect-msg {color:red;}
+		.send-msg {color:#888}
+	</style>
+
+
+	<script src="js/socket.io/socket.io.js"></script>
+        <script src="js/moment.min.js"></script>
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+	<script>
+
+    var id = 'GUY' + Math.floor((Math.random()*1000)+1);
+    
+		var socket =  io.connect('http://188.166.122.27:9092/chat');
+
+		socket.on('connect', function() {
+			output('<span class="connect-msg">Client has connected to the server!</span>');
+		});
+
+		socket.on('chatevent', function(data) {
+			output('<span class="username-msg">' + 'Admin' + ':</span> ' + data.message + '; ');
+		});
+
+		socket.on('disconnect', function() {
+			output('<span class="disconnect-msg">The client has disconnected!</span>');
+		});
+
+    function sendDisconnect() {
+      socket.disconnect();
+    }
+
+		function sendMessage() {
+                        var message = $('#msg').val();
+                        var userName = $('#userName').val();
+                        $('#msg').val('');
+                        output(message+ ' :('+id+')');
+                        socket.emit('chatevent', {userName: userName, message: message,id: id});
+		}
+
+		function output(message) {
+                        var currentTime = "<span class='time'>" +  moment().format('HH:mm:ss.SSS') + "</span>";
+                        var element = $("<div>" + currentTime + " " + message + "</div>");
+			$('#console').prepend(element);
+		}
+
+        $(document).keydown(function(e){
+            if(e.keyCode == 13) {
+                $('#send').click();
+            }
+        });
+	</script>
 </head>
+
 <body>
-	1) Паденеие всех криптовалют (И кто чувствовал себя самым лучшим среди всех)
-	<br>
-    2) О керейских и китайских законах (корейский банк)
-<br>
-http://www.bbc.com/news/business-42713314
-<br>
-https://www.fool.com/investing/2018/01/17/step-aside-ripple-and-stellar-qtum-just-landed-2-b.aspx
+
+	<h1>Netty-socketio Demo Chat</h1>
+
+	<br/>
+
+	<div id="console" class="well">
+	</div>
+
+        <form class="well form-inline" onsubmit="return false;">
+           <input id="userName" class="input-xlarge" type="text" placeholder="User name"/>
+           <input id="msg" class="input-xlarge" type="text" placeholder="Type something..."/>
+           <button type="button" onClick="sendMessage()" class="btn" id="send">Send</button>
+           <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
+        </form>
+
+
+
 </body>
+
 </html>

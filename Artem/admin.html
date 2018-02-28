@@ -29,16 +29,15 @@
 
 	<script>
 
-    var id = 'GUY' + Math.floor((Math.random()*1000)+1);
-    
-		var socket =  io.connect('http://188.166.122.27:9092/chat');
+    var id = 'user' + Math.floor((Math.random()*1000)+1);
+		var socket =  io.connect('http://188.166.122.27:9092/chatAdmin');
 
 		socket.on('connect', function() {
 			output('<span class="connect-msg">Client has connected to the server!</span>');
 		});
 
 		socket.on('chatevent', function(data) {
-			output('<span class="username-msg">' + 'Admin' + ':</span> ' + data.message + '; ');
+			output('<span class="username-msg">' + data.userName + ':</span> ' + data.message + '; ' + data.id);
 		});
 
 		socket.on('disconnect', function() {
@@ -53,8 +52,8 @@
                         var message = $('#msg').val();
                         var userName = $('#userName').val();
                         $('#msg').val('');
-                        output(message+ ' :('+id+')');
-                        socket.emit('chatevent', {userName: userName, message: message,id: id});
+                        output(message);
+                        socket.emit('chatevent', {userName: userName, message: message,id: userName});
 		}
 
 		function output(message) {
